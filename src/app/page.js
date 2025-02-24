@@ -26,7 +26,7 @@ const openings_fen = {
 
 
   async function getMasterMoves(FEN) {
-    const response = await fetch(`/lichess/masters?fen=${FEN}`).catch(error => {console.log("INVALID DATA2")})
+    const response = await fetch(`/api/lichess/masters?fen=${FEN}`).catch(error => {console.log("INVALID DATA2")})
     return await response.json()
   }
 
@@ -38,8 +38,8 @@ const openings_fen = {
   async function getNormieMoves(FEN, minELO) {
     
     // GRAB NORMIE MOVES
-    const response2 = await fetch(`/lichess/lichess?fen=${FEN}&ratings=${minELO}`).catch(error => {console.log("INVALID DATA2")});
-    return await response2.json();
+    const response = await fetch(`/api/lichess/lichess?fen=${FEN}&ratings=${minELO}`).catch(error => {console.log("INVALID DATA2")});
+    return await response.json();
   }
 
   async function loadRandomPosition(setGame, opening, minELO, setMinELO, allowDrop, needFetchInfo, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove) {
@@ -67,7 +67,7 @@ const openings_fen = {
     // loop through numMoves times, grabbing the most popular moves, choosing a random one, and playing it
     for (let i = 0; i < numMoves; i++) {
       // const response = await fetch(`/lichess/masters?fen=${openings_fen[opening]}`).catch(error => {console.log("INVALID DATA2")})
-      const response = await fetch(`/lichess/lichess?fen=${position_fen}&ratings=${minELO}`).catch(error => {console.log("INVALID DATA2")})
+      const response = await fetch(`/api/lichess/lichess?fen=${position_fen}&ratings=${minELO}`).catch(error => {console.log("INVALID DATA2")})
       const data =  await response.json()
       let moveNum = random.integer(0, data.moves.length - 1)
       console.log("Random move to choose: " + moveNum)
@@ -162,9 +162,7 @@ const openings_fen = {
 function getBestMove(fen, depth = 15) {
   // return promise once resolve from stockfish worker in new process
   return new Promise((resolve) => {
-    const stockfish = new Worker(new URL("stockfish.js", import.meta.url), {
-    type: "module",
-    });
+    const stockfish = new Worker("/stockfish.js");
     
     // post message to use uci format, check if stockfish is ready, and grab top 3 moves/lines
     stockfish.postMessage("uci");
