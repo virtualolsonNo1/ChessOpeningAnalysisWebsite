@@ -70,6 +70,12 @@ const openings_fen = {
       const response = await fetch(`/api/lichess/lichess?fen=${position_fen}&ratings=${minELO}`).catch(error => {console.log("INVALID DATA2")})
       const data =  await response.json()
       let moveNum = random.integer(0, data.moves.length - 1)
+
+      // TODO: REMOVE LATER, TEMP FIX TO WORSE PROBLEM!!!!!!!!!!!!!!!!
+      if (moveNum > 3) {
+        moveNum = random.integer(0, 3);
+      }
+      
       console.log("Random move to choose: " + moveNum)
       
       console.log(data)
@@ -278,7 +284,7 @@ function onDrop(sourceSquare, targetSquare) {
 
         {/* Controls & Info */}
         <div className="w-full">
-          <div className="bg-gray-100 p-4 rounded">
+          <div className="p-4 rounded">
             <h2>Please Select an Opening to Study</h2>
             <select onChange={(e) => displayOpening(e.target.value, opening, setGame, allowDrop)}>
               <option value="random">Random</option>
