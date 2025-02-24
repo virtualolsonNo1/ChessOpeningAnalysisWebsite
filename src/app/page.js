@@ -42,7 +42,7 @@ const openings_fen = {
     return await response.json();
   }
 
-  async function loadRandomPosition(setGame, opening, minELO, setMinELO, allowDrop, needFetchInfo, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove) {
+  async function loadRandomPosition(setGame, opening, minELO, allowDrop, needFetchInfo, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate) {
     // re-set move text before re-render
     stockfishMove0.current = {};
     stockfishMove1.current = {};
@@ -157,10 +157,10 @@ const openings_fen = {
     stockfishMove2.current["UCI"] = stockfishMoves.move3UCI;
     stockfishMove2.current["CP"] = stockfishMoves.move3CP;
     
-    // TODO: FIX WITH NEW useState or whatever
     // re-render if person already played move so best moves still show up
     if (allowDrop.current == false) {
-      setMinELO(minELO + 0);
+      setMovesFoundLate(movesFoundLate + 1);
+      console.log("movesFoundLate: ", movesFoundLate);
     }
 
   }
@@ -214,6 +214,7 @@ function getBestMove(fen, depth = 15) {
 function App() {
 const [game, setGame] = useState(new Chess());
 const [minELO, setMinELO] = useState("1800");
+const [movesFoundLate, setMovesFoundLate] = useState(0);
 const opening = useRef("random");
 const allowDrop = useRef(false);
 const needFetchInfo = useRef(false);
@@ -306,7 +307,7 @@ function onDrop(sourceSquare, targetSquare) {
                       onChange={(e) => updateMinELO(e.target.value, setMinELO)}
                     />
                   </div>
-            <button onClick={() => loadRandomPosition(setGame, opening, minELO, setMinELO, allowDrop, needFetchInfo, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove)}>Next Position</button>
+            <button onClick={() => loadRandomPosition(setGame, opening, minELO, allowDrop, needFetchInfo, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate)}>Next Position</button>
           </div>
         </div>
       </div>
