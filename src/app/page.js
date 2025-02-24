@@ -287,7 +287,7 @@ function onDrop(sourceSquare, targetSquare) {
         <div className="w-full">
           <div className="p-4 rounded">
             <h2>Please Select an Opening to Study</h2>
-            <select onChange={(e) => displayOpening(e.target.value, opening, setGame, allowDrop)}>
+            <select className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600" onChange={(e) => displayOpening(e.target.value, opening, setGame, allowDrop)}>
               <option value="random">Random</option>
               <option value="italian">Italian Game</option>
               <option value="sicilian">Sicilian Defense</option>
@@ -305,9 +305,11 @@ function onDrop(sourceSquare, targetSquare) {
                       max="2500"
                       value={minELO}
                       onChange={(e) => updateMinELO(e.target.value, setMinELO)}
+                      className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600 w-full"
                     />
                   </div>
-            <button onClick={() => loadRandomPosition(setGame, opening, minELO, allowDrop, needFetchInfo, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate)}>Next Position</button>
+            <button onClick={() => loadRandomPosition(setGame, opening, minELO, allowDrop, needFetchInfo, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate)} 
+            className="mt-4 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Next Position</button>
           </div>
         </div>
       </div>
