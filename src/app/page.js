@@ -241,6 +241,7 @@ const normieMove0 = useRef("");
 const normieMove1 = useRef("");
 const normieMove2 = useRef("");
 const yourMove = useRef("");
+// const displayAnalysisBoardButton = useRef(false);
 
 // Define the onDrop function
 function onDrop(sourceSquare, targetSquare) {
@@ -294,8 +295,8 @@ function onDrop(sourceSquare, targetSquare) {
     <div className="flex flex-col md:flex-row gap-4">
       {/* Chess board */}
 
-      <div className="pt-5 font-bold">Generate Random Position Then Play What You Think the Best Move is and See If It's Good!!!</div>
       <div className="w-full md:w-2/3">
+        <div className="pt-5 font-bold">Generate Random Position Then Play What You Think the Best Move is and See If It's Good!!!</div>
         <Chessboard position={game.fen()} onPieceDrop={onDrop} arePiecesDraggable={allowDrop.current} animationDuration={300}/>
 
         {/* Controls & Info */}
@@ -323,6 +324,7 @@ function onDrop(sourceSquare, targetSquare) {
                       className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600 w-full"/>
                   </div>
             <button onClick={() => loadRandomPosition(setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses)} 
+            disabled={randomPositionDisabled}
             className={`mt-4 ${randomPositionDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : `bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}`}>Next Position</button>
             {loadingAPIResponses && <div className="loader flex items-center">
             <span className="pr-5 font-bold">Loading Best Moves</span>
