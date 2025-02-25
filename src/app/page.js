@@ -42,7 +42,7 @@ const openings_fen = {
     return await response.json();
   }
 
-  async function loadRandomPosition(setGame, opening, minELO, allowDrop, needFetchInfo, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate) {
+  async function loadRandomPosition(setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled) {
     // re-set move text before re-render
     stockfishMove0.current = {};
     stockfishMove1.current = {};
@@ -56,6 +56,7 @@ const openings_fen = {
     yourMove.current = ""
 
     // re-render current opening before displaying new position
+    setRandomPositionDisabled(true);
     setGame(new Chess(openings_fen[opening.current]))
 
     // get random numbers of moves to go ahead
@@ -120,6 +121,9 @@ const openings_fen = {
     
     // re-render
     setGame(new Chess(position_fen))
+
+    // allow player to click button again
+    setRandomPositionDisabled(false);
     
     // allow pieces to be moved post-re-render with new position
     allowDrop.current = true;
@@ -215,9 +219,9 @@ function App() {
 const [game, setGame] = useState(new Chess());
 const [minELO, setMinELO] = useState("1800");
 const [movesFoundLate, setMovesFoundLate] = useState(0);
+const [randomPositionDisabled, setRandomPositionDisabled] = useState(false);
 const opening = useRef("random");
 const allowDrop = useRef(false);
-const needFetchInfo = useRef(false);
 const stockfishMove0 = useRef({});
 const stockfishMove1 = useRef({});
 const stockfishMove2 = useRef({});
@@ -308,8 +312,8 @@ function onDrop(sourceSquare, targetSquare) {
                       className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600 w-full"
                     />
                   </div>
-            <button onClick={() => loadRandomPosition(setGame, opening, minELO, allowDrop, needFetchInfo, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate)} 
-            className="mt-4 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Next Position</button>
+            <button onClick={() => loadRandomPosition(setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled)} 
+            className={`mt-4 ${randomPositionDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : `bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}`}>Next Position</button>
           </div>
         </div>
       </div>
