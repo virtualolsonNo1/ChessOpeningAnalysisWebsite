@@ -4,9 +4,15 @@ import { useState, useRef, useEffect } from 'react'
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { Random } from 'random-js';
-
+import ClipLoader from "react-spinners/ClipLoader";
 const random = new Random()
 
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "red",
+  // any other CSS properties you want to override
+};
 
 const openings_fen = { 
      random: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -42,7 +48,7 @@ const openings_fen = {
     return await response.json();
   }
 
-  async function loadRandomPosition(setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled) {
+  async function loadRandomPosition(setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses) {
     // re-set move text before re-render
     stockfishMove0.current = {};
     stockfishMove1.current = {};
@@ -128,6 +134,7 @@ const openings_fen = {
     // allow pieces to be moved post-re-render with new position
     allowDrop.current = true;
 
+    setLoadingAPIResponses(true); 
     // after re-render, grab info for best moves on the board
     // grab all best moves, doing so in parallel using Promise.all so io time on one starts others
     const [masterMoves, normieMoves, stockfishMoves] = await Promise.all([
@@ -137,6 +144,7 @@ const openings_fen = {
     ]);
     
 
+    setLoadingAPIResponses(false); 
     // update master best moves text
     console.log(masterMoves.moves[0])
     console.log(masterMoves.moves[1])
@@ -220,6 +228,7 @@ const [game, setGame] = useState(new Chess());
 const [minELO, setMinELO] = useState("1800");
 const [movesFoundLate, setMovesFoundLate] = useState(0);
 const [randomPositionDisabled, setRandomPositionDisabled] = useState(false);
+const [loadingAPIResponses, setLoadingAPIResponses] = useState(false);
 const opening = useRef("random");
 const allowDrop = useRef(false);
 const stockfishMove0 = useRef({});
@@ -284,6 +293,8 @@ function onDrop(sourceSquare, targetSquare) {
     {/* Mobile: stacked, Desktop: side-by-side */}
     <div className="flex flex-col md:flex-row gap-4">
       {/* Chess board */}
+
+      <div className="pt-5 font-bold">Generate Random Position Then Play What You Think the Best Move is and See If It's Good!!!</div>
       <div className="w-full md:w-2/3">
         <Chessboard position={game.fen()} onPieceDrop={onDrop} arePiecesDraggable={allowDrop.current} animationDuration={300}/>
 
@@ -302,18 +313,26 @@ function onDrop(sourceSquare, targetSquare) {
               <h2>ELO Rating Input</h2>
                   <div>
                     <label htmlFor="eloInput">Enter ELO Rating (0-2500):</label>
-                    <input
+                      <input
                       id="eloInput"
                       type="number"
                       min="0"
                       max="2500"
                       value={minELO}
                       onChange={(e) => updateMinELO(e.target.value, setMinELO)}
-                      className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600 w-full"
-                    />
+                      className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600 w-full"/>
                   </div>
-            <button onClick={() => loadRandomPosition(setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled)} 
+            <button onClick={() => loadRandomPosition(setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses)} 
             className={`mt-4 ${randomPositionDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : `bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}`}>Next Position</button>
+            {loadingAPIResponses && <div className="loader flex items-center">
+            <span className="pr-5 font-bold">Loading Best Moves</span>
+            <ClipLoader
+            color={"#00ff00"}
+            loading={loadingAPIResponses.current}
+            override={override}
+            size={20}
+            /></div>}
+            {loadingAPIResponses && <span>Feel Free to Play Your Move in the Meantime</span>}
           </div>
         </div>
       </div>
