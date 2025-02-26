@@ -48,7 +48,7 @@ const openings_fen = {
     return await response.json();
   }
 
-  async function loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN) {
+  async function loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN, displayPlayMoveText) {
     // re-set move text before re-render
     stockfishMove0.current = {};
     stockfishMove1.current = {};
@@ -61,6 +61,7 @@ const openings_fen = {
     normieMove2.current = "";
     yourMove.current = ""
     disableAnalysisBoardButton.current = true;
+    displayPlayMoveText.current = false;
 
     // re-render current opening before displaying new position
     setRandomPositionDisabled(true);
@@ -129,6 +130,7 @@ const openings_fen = {
     chessboardOrientation.current = board.turn() == 'w' ? 'white' : 'black';
     analysisBoardFEN.current = position_fen;
     disableAnalysisBoardButton.current = false;
+    displayPlayMoveText.current = true;
     // re-render
     setGame(new Chess(position_fen))
 
@@ -151,6 +153,7 @@ const openings_fen = {
 
     setLoadingAPIResponses(false); 
 
+    // set timeout so that re-render occurrs before these are updated
     setTimeout(() => {
       // update master best moves text
       console.log(masterMoves.moves[0])
@@ -182,7 +185,7 @@ const openings_fen = {
         console.log("movesFoundLate: ", movesFoundLate);
       }
       console.log(allowDrop.current);
-  }, 1);
+    }, 1);
 
   }
 
@@ -259,6 +262,7 @@ const yourMove = useRef("");
 const disableAnalysisBoardButton = useRef(true);
 const analysisBoardFEN = useRef("");
 const chessboardOrientation = useRef('white');
+const displayPlayMoveText = useRef(false);
 
 // Define the onDrop function
 function onDrop(sourceSquare, targetSquare) {
@@ -297,6 +301,7 @@ function onDrop(sourceSquare, targetSquare) {
     normieMove2.current = "";
     yourMove.current = "";
     disableAnalysisBoardButton.current = true;
+    displayPlayMoveText.current = false;
 
     opening.current = new_opening;
     // Update the game state
@@ -317,11 +322,14 @@ function onDrop(sourceSquare, targetSquare) {
         <div className="max-w-lg mx-auto">
         <Chessboard position={game.fen()} onPieceDrop={onDrop} arePiecesDraggable={allowDrop.current} boardOrientation={chessboardOrientation.current} animationDuration={300}/>
         </div>
+        {displayPlayMoveText.current && <div className="text-center font-bold text-lg my-2 bg-blue-100 dark:bg-blue-900 rounded text-black dark:text-white max-w-lg mx-auto">
+         {"Please play a move and compare with the best moves!"} 
+        </div>}
         {/* Controls & Info */}
         <div className="w-full">
-          <div className="p-2 rounded flex flex-col items-center text-center">
+          <div className="rounded flex flex-col items-center text-center">
             <h2>Please Select an Opening to Study</h2>
-            <select className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600" onChange={(e) => displayOpening(e.target.value, opening, setGame, allowDrop)}>
+            <select className="bg-white dark:bg-gray-700 text-black dark:text-white rounded border border-gray-300 dark:border-gray-600" onChange={(e) => displayOpening(e.target.value, opening, setGame, allowDrop)}>
               <option value="random">Random</option>
               <option value="italian">Italian Game</option>
               <option value="sicilian">Sicilian Defense</option>
@@ -340,9 +348,9 @@ function onDrop(sourceSquare, targetSquare) {
                 onChange={(e) => updateMinELO(e.target.value, setMinELO)}
                 className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600 w-full"/>
               </div>
-            <button onClick={() => loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN)} 
+            <button onClick={() => loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN, displayPlayMoveText)} 
             disabled={randomPositionDisabled}
-            className={`mt-2 ${randomPositionDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : `bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}`}>Generate Random Position</button>
+            className={`mt-2 ${randomPositionDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : `bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-1 px-4 rounded`}`}>Generate Random Position</button>
           </div>
         </div>
       </div>
