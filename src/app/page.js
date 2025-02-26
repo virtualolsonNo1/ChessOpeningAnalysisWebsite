@@ -48,7 +48,7 @@ const openings_fen = {
     return await response.json();
   }
 
-  async function loadRandomPosition(setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses) {
+  async function loadRandomPosition(setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN) {
     // re-set move text before re-render
     stockfishMove0.current = {};
     stockfishMove1.current = {};
@@ -60,6 +60,7 @@ const openings_fen = {
     normieMove1.current = "";
     normieMove2.current = "";
     yourMove.current = ""
+    disableAnalysisBoardButton.current = true;
 
     // re-render current opening before displaying new position
     setRandomPositionDisabled(true);
@@ -124,7 +125,10 @@ const openings_fen = {
       // setGame(new Chess(position_fen))
 
     }
+
     
+    analysisBoardFEN.current = position_fen;
+    disableAnalysisBoardButton.current = false;
     // re-render
     setGame(new Chess(position_fen))
 
@@ -222,6 +226,12 @@ function getBestMove(fen, depth = 15) {
   });
 }
 
+function openLichessAnalysisBoard(fen) {
+  const url = `https://lichess.org/analysis/${fen}`;
+
+  window.open(url, '_blank');
+}
+
 
 function App() {
 const [game, setGame] = useState(new Chess());
@@ -241,7 +251,8 @@ const normieMove0 = useRef("");
 const normieMove1 = useRef("");
 const normieMove2 = useRef("");
 const yourMove = useRef("");
-// const displayAnalysisBoardButton = useRef(false);
+const disableAnalysisBoardButton = useRef(true);
+const analysisBoardFEN = useRef("");
 
 // Define the onDrop function
 function onDrop(sourceSquare, targetSquare) {
@@ -279,6 +290,7 @@ function onDrop(sourceSquare, targetSquare) {
     normieMove1.current = "";
     normieMove2.current = "";
     yourMove.current = "";
+    disableAnalysisBoardButton = true;
 
     opening.current = new_opening;
     // Update the game state
@@ -323,7 +335,7 @@ function onDrop(sourceSquare, targetSquare) {
                       onChange={(e) => updateMinELO(e.target.value, setMinELO)}
                       className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600 w-full"/>
                   </div>
-            <button onClick={() => loadRandomPosition(setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses)} 
+            <button onClick={() => loadRandomPosition(setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN)} 
             disabled={randomPositionDisabled}
             className={`mt-4 ${randomPositionDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : `bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}`}>Next Position</button>
             {loadingAPIResponses && <div className="loader flex items-center">
@@ -354,6 +366,8 @@ function onDrop(sourceSquare, targetSquare) {
               <p>Move 0: {normieMove0.current}</p>
               <p>Move 1: {normieMove1.current}</p>
               <p>Move 2: {normieMove2.current}</p>
+            {!disableAnalysisBoardButton.current && <button onClick={() => openLichessAnalysisBoard(analysisBoardFEN.current)} 
+            className={`mt-4 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}>Go To Lichess Analysis Board</button>}
           </div>
         </div>
     </div>
