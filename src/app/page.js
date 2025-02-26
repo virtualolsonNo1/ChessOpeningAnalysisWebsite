@@ -48,7 +48,7 @@ const openings_fen = {
     return await response.json();
   }
 
-  async function loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN, displayPlayMoveText) {
+  async function loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN, displayPlayMoveText, setArrows) {
     // re-set move text before re-render
     stockfishMove0.current = {};
     stockfishMove1.current = {};
@@ -64,6 +64,10 @@ const openings_fen = {
     displayPlayMoveText.current = false;
 
     // re-render current opening before displaying new position
+
+    setArrows([['', '', ''],
+              ['', '', ''],
+              ['', '', '']]);
     setRandomPositionDisabled(true);
     setGame(new Chess(openings_fen[opening.current]))
 
@@ -182,7 +186,11 @@ const openings_fen = {
       
       // re-render if person already played move so best moves still show up
       if (allowDrop.current == false) {
-        setMovesFoundLate(movesFoundLate + 1);
+        setArrows([[stockfishMove0.current["UCI"].substring(0, 2), stockfishMove0.current["UCI"].substring(2, 4), 'green'],
+                  [stockfishMove1.current["UCI"].substring(0, 2), stockfishMove1.current["UCI"].substring(2, 4), 'yellow'],
+                  [stockfishMove2.current["UCI"].substring(0, 2), stockfishMove2.current["UCI"].substring(2, 4), 'orange']]
+      );
+        // setMovesFoundLate(movesFoundLate + 1);
         console.log("movesFoundLate: ", movesFoundLate);
       }
       console.log(allowDrop.current);
@@ -248,6 +256,11 @@ const [minELO, setMinELO] = useState("1800");
 const [movesFoundLate, setMovesFoundLate] = useState(0);
 const [randomPositionDisabled, setRandomPositionDisabled] = useState(false);
 const [loadingAPIResponses, setLoadingAPIResponses] = useState(false);
+const [arrows, setArrows] = useState([
+  ['', '', ''],
+  ['', '', ''],
+  ['', '', '']
+]);
 const opening = useRef("random");
 const allowDrop = useRef(false);
 const stockfishMove0 = useRef({});
@@ -281,6 +294,12 @@ function onDrop(sourceSquare, targetSquare) {
       // Update the game state
       setGame(new Chess(game.fen()));
       allowDrop.current = false;
+      if (loadingAPIResponses == false) {
+        setArrows([[stockfishMove0.current["UCI"].substring(0, 2), stockfishMove0.current["UCI"].substring(2, 4), 'green'],
+                  [stockfishMove1.current["UCI"].substring(0, 2), stockfishMove1.current["UCI"].substring(2, 4), 'yellow'],
+                  [stockfishMove2.current["UCI"].substring(0, 2), stockfishMove2.current["UCI"].substring(2, 4), 'orange']]
+      );
+      }
       return true;
     } catch (error) {
       console.error("Error in onDrop:", error);
@@ -310,6 +329,10 @@ function onDrop(sourceSquare, targetSquare) {
     console.log(openings_fen[opening.current])
 
     allowDrag.current = false
+
+    setArrows([['', '', ''],
+              ['', '', ''],
+              ['', '', '']]);
     setGame(new Chess(openings_fen[new_opening]));
   }
   
@@ -321,7 +344,7 @@ function onDrop(sourceSquare, targetSquare) {
 
       <div className="w-full md:w-2/3">
         <div className="max-w-lg mx-auto">
-        <Chessboard position={game.fen()} onPieceDrop={onDrop} arePiecesDraggable={allowDrop.current} boardOrientation={chessboardOrientation.current} areArrowsAllowed={allowDrop.current} animationDuration={300}/>
+        <Chessboard position={game.fen()} onPieceDrop={onDrop} arePiecesDraggable={allowDrop.current} boardOrientation={chessboardOrientation.current} areArrowsAllowed={allowDrop.current} customArrows={arrows} animationDuration={300}/>
         </div>
         {displayPlayMoveText.current && <div className="text-center font-bold text-lg my-2 bg-blue-100 dark:bg-blue-900 rounded text-black dark:text-white max-w-lg mx-auto">
          {"Please play a move and compare with the best moves!"} 
@@ -349,7 +372,7 @@ function onDrop(sourceSquare, targetSquare) {
                 onChange={(e) => updateMinELO(e.target.value, setMinELO)}
                 className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600 w-full"/>
               </div>
-            <button onClick={() => loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN, displayPlayMoveText)} 
+            <button onClick={() => loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN, displayPlayMoveText, setArrows)} 
             disabled={randomPositionDisabled}
             className={`mt-2 ${randomPositionDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : `bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-1 px-4 rounded`}`}>Generate Random Position</button>
           </div>
@@ -369,9 +392,9 @@ function onDrop(sourceSquare, targetSquare) {
             /></div>}
             {loadingAPIResponses && <div className="pb-5">Feel Free to Play Your Move in the Meantime</div>}
             <h3 className="text-l font-bold mb-4">Stockfish Best Moves</h3> 
-            <p>Stockfish Move 0: {stockfishMove0.current["UCI"]}, CP: {stockfishMove0.current["CP"]}</p>
-            <p>Stockfish Move 1: {stockfishMove1.current["UCI"]}, CP: {stockfishMove1.current["CP"]}</p>
-            <p>Stockfish Move 2: {stockfishMove2.current["UCI"]}, CP: {stockfishMove2.current["CP"]}</p>
+            <p className="text-green-500">Stockfish Move 0: {stockfishMove0.current["UCI"]}, CP: {stockfishMove0.current["CP"]}</p>
+            <p className="text-yellow-500">Stockfish Move 1: {stockfishMove1.current["UCI"]}, CP: {stockfishMove1.current["CP"]}</p>
+            <p className="text-orange-500">Stockfish Move 2: {stockfishMove2.current["UCI"]}, CP: {stockfishMove2.current["CP"]}</p>
             <h3 className="text-l font-bold mb-4">Popular Master Moves</h3> 
             <p>Master Move 0: {masterMove0.current}</p>
             <p>Master Move 1: {masterMove1.current}</p>
