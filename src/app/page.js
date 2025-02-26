@@ -48,11 +48,14 @@ const openings_fen = {
     return await response.json();
   }
 
-  async function loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN, displayPlayMoveText, setArrows) {
-    // re-set move text before re-render
-    stockfishMove0.current = {};
-    stockfishMove1.current = {};
-    stockfishMove2.current = {};
+  async function loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN, displayPlayMoveText, setArrows, displayMovesText) {
+    // re-set move text
+    stockfishMove0.current["UCI"] = "";
+    stockfishMove0.current["CP"] = "";
+    stockfishMove1.current["UCI"] = "";
+    stockfishMove1.current["CP"] = "";
+    stockfishMove2.current["UCI"] = "";
+    stockfishMove2.current["CP"] = "";
     masterMove0.current = "";
     masterMove1.current = "";
     masterMove2.current = "";
@@ -62,6 +65,7 @@ const openings_fen = {
     yourMove.current = ""
     disableAnalysisBoardButton.current = true;
     displayPlayMoveText.current = false;
+    displayMovesText.current = false;
 
     // re-render current opening before displaying new position
 
@@ -74,6 +78,11 @@ const openings_fen = {
     // get random numbers of moves to go ahead
     let numMoves = random.integer(0, 3)
     numMoves = (numMoves * 2) + 1
+
+    // if opening is random want truly random move, not just random position for that side
+    if (opening.current == "random") {
+      numMoves = random.integer(1, 10);
+    }
     console.log("Num random moves: " + numMoves)
     
     let position_fen = openings_fen[opening.current]
@@ -136,7 +145,8 @@ const openings_fen = {
     analysisBoardFEN.current = position_fen;
     disableAnalysisBoardButton.current = false;
     displayPlayMoveText.current = true;
-    // re-render
+    
+    // set updated game
     setGame(new Chess(position_fen))
 
     // allow player to click button again
@@ -159,43 +169,40 @@ const openings_fen = {
     setLoadingAPIResponses(false); 
 
     // set timeout so that re-render occurrs before these are updated
-    setTimeout(() => {
-      // update master best moves text
-      console.log(masterMoves.moves[0])
-      console.log(masterMoves.moves[1])
-      console.log(masterMoves.moves[2])
-      masterMove0.current = masterMoves.moves[0] != undefined ? masterMoves.moves[0].uci : "No move found";
-      masterMove1.current = masterMoves.moves[1] != undefined ? masterMoves.moves[1].uci : "No move found";
-      masterMove2.current = masterMoves.moves[2] != undefined ? masterMoves.moves[2].uci : "No move found";
+    // update master best moves text
+    console.log(masterMoves.moves[0])
+    console.log(masterMoves.moves[1])
+    console.log(masterMoves.moves[2])
+    masterMove0.current = masterMoves.moves[0] != undefined ? masterMoves.moves[0].uci : "No move found";
+    masterMove1.current = masterMoves.moves[1] != undefined ? masterMoves.moves[1].uci : "No move found";
+    masterMove2.current = masterMoves.moves[2] != undefined ? masterMoves.moves[2].uci : "No move found";
 
-      // update normie best moves
-      console.log(normieMoves.moves[0])
-      console.log(normieMoves.moves[1])
-      console.log(normieMoves.moves[2])
-      normieMove0.current = normieMoves.moves[0] != undefined ? normieMoves.moves[0].uci : "No move found";
-      normieMove1.current = normieMoves.moves[1] != undefined ? normieMoves.moves[1].uci : "No move found";
-      normieMove2.current = normieMoves.moves[2] != undefined ? normieMoves.moves[2].uci : "No move found";
+    // update normie best moves
+    console.log(normieMoves.moves[0])
+    console.log(normieMoves.moves[1])
+    console.log(normieMoves.moves[2])
+    normieMove0.current = normieMoves.moves[0] != undefined ? normieMoves.moves[0].uci : "No move found";
+    normieMove1.current = normieMoves.moves[1] != undefined ? normieMoves.moves[1].uci : "No move found";
+    normieMove2.current = normieMoves.moves[2] != undefined ? normieMoves.moves[2].uci : "No move found";
 
-      console.log("BEST MOVE: ", stockfishMoves);
-      stockfishMove0.current["UCI"] = stockfishMoves.move1UCI;
-      stockfishMove0.current["CP"] = stockfishMoves.move1CP;
-      stockfishMove1.current["UCI"] = stockfishMoves.move2UCI;
-      stockfishMove1.current["CP"] = stockfishMoves.move2CP;
-      stockfishMove2.current["UCI"] = stockfishMoves.move3UCI;
-      stockfishMove2.current["CP"] = stockfishMoves.move3CP;
-      
-      // re-render if person already played move so best moves still show up
-      if (allowDrop.current == false) {
-        setArrows([[stockfishMove0.current["UCI"].substring(0, 2), stockfishMove0.current["UCI"].substring(2, 4), 'green'],
-                  [stockfishMove1.current["UCI"].substring(0, 2), stockfishMove1.current["UCI"].substring(2, 4), 'yellow'],
-                  [stockfishMove2.current["UCI"].substring(0, 2), stockfishMove2.current["UCI"].substring(2, 4), 'orange']]
-      );
-        // setMovesFoundLate(movesFoundLate + 1);
-        console.log("movesFoundLate: ", movesFoundLate);
-      }
-      console.log(allowDrop.current);
-    }, 1);
-
+    console.log("BEST MOVE: ", stockfishMoves);
+    stockfishMove0.current["UCI"] = stockfishMoves.move1UCI;
+    stockfishMove0.current["CP"] = stockfishMoves.move1CP;
+    stockfishMove1.current["UCI"] = stockfishMoves.move2UCI;
+    stockfishMove1.current["CP"] = stockfishMoves.move2CP;
+    stockfishMove2.current["UCI"] = stockfishMoves.move3UCI;
+    stockfishMove2.current["CP"] = stockfishMoves.move3CP;
+    
+    // re-render if person already played move so best moves still show up
+    if (allowDrop.current == false) {
+      setArrows([[stockfishMove0.current["UCI"].substring(0, 2), stockfishMove0.current["UCI"].substring(2, 4), 'green'],
+                [stockfishMove1.current["UCI"].substring(0, 2), stockfishMove1.current["UCI"].substring(2, 4), 'yellow'],
+                [stockfishMove2.current["UCI"].substring(0, 2), stockfishMove2.current["UCI"].substring(2, 4), 'orange']]
+    );
+      // setMovesFoundLate(movesFoundLate + 1);
+      console.log("movesFoundLate: ", movesFoundLate);
+    }
+    console.log(allowDrop.current);
   }
 
 function getBestMove(fen, depth = 15) {
@@ -277,6 +284,7 @@ const disableAnalysisBoardButton = useRef(true);
 const analysisBoardFEN = useRef("");
 const chessboardOrientation = useRef('white');
 const displayPlayMoveText = useRef(false);
+const displayMovesText = useRef(false)
 
 // Define the onDrop function
 function onDrop(sourceSquare, targetSquare) {
@@ -289,8 +297,9 @@ function onDrop(sourceSquare, targetSquare) {
       // If the move is illegal, return false to revert
       if (move === null) return false;
 
-      // update yourMove before re-render
-      yourMove.current = move.san;
+      displayMovesText.current = true;
+      // update yourMove
+      yourMove.current = move.from + move.to;
       // Update the game state
       setGame(new Chess(game.fen()));
       allowDrop.current = false;
@@ -310,9 +319,12 @@ function onDrop(sourceSquare, targetSquare) {
 
   function displayOpening(new_opening, opening, setGame, allowDrag) {
     // re-set move text before re-render
-    stockfishMove0.current = {};
-    stockfishMove1.current = {};
-    stockfishMove2.current = {};
+    stockfishMove0.current["UCI"] = "";
+    stockfishMove0.current["CP"] = "";
+    stockfishMove1.current["UCI"] = "";
+    stockfishMove1.current["CP"] = "";
+    stockfishMove2.current["UCI"] = "";
+    stockfishMove2.current["CP"] = "";
     masterMove0.current = "";
     masterMove1.current = "";
     masterMove2.current = "";
@@ -322,6 +334,7 @@ function onDrop(sourceSquare, targetSquare) {
     yourMove.current = "";
     disableAnalysisBoardButton.current = true;
     displayPlayMoveText.current = false;
+    displayMovesText.current = false;
 
     opening.current = new_opening;
     // Update the game state
@@ -372,7 +385,7 @@ function onDrop(sourceSquare, targetSquare) {
                 onChange={(e) => updateMinELO(e.target.value, setMinELO)}
                 className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600 w-full"/>
               </div>
-            <button onClick={() => loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN, displayPlayMoveText, setArrows)} 
+            <button onClick={() => loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN, displayPlayMoveText, setArrows, displayMovesText)} 
             disabled={randomPositionDisabled}
             className={`mt-2 ${randomPositionDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : `bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-1 px-4 rounded`}`}>Generate Random Position</button>
           </div>
@@ -392,17 +405,17 @@ function onDrop(sourceSquare, targetSquare) {
             /></div>}
             {loadingAPIResponses && <div className="pb-5">Feel Free to Play Your Move in the Meantime</div>}
             <h3 className="text-l font-bold mb-4">Stockfish Best Moves</h3> 
-            <p className="text-green-500">Stockfish Move 0: {stockfishMove0.current["UCI"]}, CP: {stockfishMove0.current["CP"]}</p>
-            <p className="text-yellow-500">Stockfish Move 1: {stockfishMove1.current["UCI"]}, CP: {stockfishMove1.current["CP"]}</p>
-            <p className="text-orange-500">Stockfish Move 2: {stockfishMove2.current["UCI"]}, CP: {stockfishMove2.current["CP"]}</p>
+            <p className="text-green-500">Stockfish Move 0: {displayMovesText.current ? `${stockfishMove0.current["UCI"]}, ${stockfishMove0.current["CP"]}` : ","}</p>
+            <p className="text-yellow-500">Stockfish Move 1: {displayMovesText.current ? `${stockfishMove1.current["UCI"]}, ${stockfishMove1.current["CP"]}` : ","}</p>
+            <p className="text-orange-500">Stockfish Move 2: {displayMovesText.current ? `${stockfishMove2.current["UCI"]}, ${stockfishMove2.current["CP"]}` : ","}</p>
             <h3 className="text-l font-bold mb-4">Popular Master Moves</h3> 
-            <p>Master Move 0: {masterMove0.current}</p>
-            <p>Master Move 1: {masterMove1.current}</p>
-            <p>Master Move 2: {masterMove2.current}</p>
+            <p>Master Move 1: {displayMovesText.current ? `${masterMove0.current}` : ""}</p>
+            <p>Master Move 2: {displayMovesText.current ? `${masterMove1.current}` : ""}</p>
+            <p>Master Move 3: {displayMovesText.current ? `${masterMove2.current}` : ""}</p>
             <h3 className="text-l font-bold mb-4">Popular Moves over {minELO}</h3> 
-            <p>Move 0: {normieMove0.current}</p>
-            <p>Move 1: {normieMove1.current}</p>
-            <p>Move 2: {normieMove2.current}</p>
+            <p>Move 0: {displayMovesText.current ? `${normieMove0.current}` : ""}</p>
+            <p>Move 1: {displayMovesText.current ? `${normieMove1.current}` : ""}</p>
+            <p>Move 2: {displayMovesText.current ? `${normieMove2.current}` : ""}</p>
           {!disableAnalysisBoardButton.current && <button onClick={() => openLichessAnalysisBoard(analysisBoardFEN.current)} 
           className={`mt-4 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}>Go To Lichess Analysis Board</button>}
         </div>
