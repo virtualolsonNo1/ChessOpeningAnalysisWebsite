@@ -68,7 +68,8 @@ const openings_fen = {
     setGame(new Chess(openings_fen[opening.current]))
 
     // get random numbers of moves to go ahead
-    let numMoves = random.integer(1, 7)
+    let numMoves = random.integer(0, 3)
+    numMoves = (numMoves * 2) + 1
     console.log("Num random moves: " + numMoves)
     
     let position_fen = openings_fen[opening.current]
@@ -320,7 +321,7 @@ function onDrop(sourceSquare, targetSquare) {
 
       <div className="w-full md:w-2/3">
         <div className="max-w-lg mx-auto">
-        <Chessboard position={game.fen()} onPieceDrop={onDrop} arePiecesDraggable={allowDrop.current} boardOrientation={chessboardOrientation.current} animationDuration={300}/>
+        <Chessboard position={game.fen()} onPieceDrop={onDrop} arePiecesDraggable={allowDrop.current} boardOrientation={chessboardOrientation.current} areArrowsAllowed={allowDrop.current} animationDuration={300}/>
         </div>
         {displayPlayMoveText.current && <div className="text-center font-bold text-lg my-2 bg-blue-100 dark:bg-blue-900 rounded text-black dark:text-white max-w-lg mx-auto">
          {"Please play a move and compare with the best moves!"} 
