@@ -290,7 +290,7 @@ function onDrop(sourceSquare, targetSquare) {
     normieMove1.current = "";
     normieMove2.current = "";
     yourMove.current = "";
-    disableAnalysisBoardButton = true;
+    disableAnalysisBoardButton.current = true;
 
     opening.current = new_opening;
     // Update the game state
