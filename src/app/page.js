@@ -329,52 +329,52 @@ function onDrop(sourceSquare, targetSquare) {
               <option value="french">French Defense</option>
               <option value="caro">Caro Kann</option>
             </select>
-                  <div>
-                    <label htmlFor="eloInput">Enter ELO Rating (0-2500):</label>
-                      <input
-                      id="eloInput"
-                      type="number"
-                      min="0"
-                      max="2500"
-                      value={minELO}
-                      onChange={(e) => updateMinELO(e.target.value, setMinELO)}
-                      className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600 w-full"/>
-                  </div>
+              <div>
+                <label htmlFor="eloInput">Enter ELO Rating (0-2500):</label>
+                <input
+                id="eloInput"
+                type="number"
+                min="0"
+                max="2500"
+                value={minELO}
+                onChange={(e) => updateMinELO(e.target.value, setMinELO)}
+                className="bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded border border-gray-300 dark:border-gray-600 w-full"/>
+              </div>
             <button onClick={() => loadRandomPosition(chessboardOrientation, setGame, opening, minELO, allowDrop, stockfishMove0, stockfishMove1, stockfishMove2, masterMove0, masterMove1, masterMove2, normieMove0, normieMove1, normieMove2, yourMove, movesFoundLate, setMovesFoundLate, setRandomPositionDisabled, loadingAPIResponses, setLoadingAPIResponses, disableAnalysisBoardButton, analysisBoardFEN)} 
             disabled={randomPositionDisabled}
-            className={`mt-2 ${randomPositionDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : `bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}`}>Next Position</button>
+            className={`mt-2 ${randomPositionDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : `bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}`}>Generate Random Position</button>
           </div>
         </div>
       </div>
-        <div className="w-full md:w-1/3">
-          <div className="bg-cream-100 p-2 rounded">
-            <h2 className="text-xl font-bold mb-4">Move Analysis</h2> 
-              <h3 className="text-l font-bold mb-4">Your Move: {yourMove.current}</h3> 
-              {loadingAPIResponses && <div className="loader flex items-center">
-              <span className="pr-5 font-bold">Loading Best Moves</span>
-              <ClipLoader
-              color={"#00ff00"}
-              loading={loadingAPIResponses.current}
-              override={override}
-              size={20}
-              /></div>}
-              {loadingAPIResponses && <div className="pb-5">Feel Free to Play Your Move in the Meantime</div>}
-              <h3 className="text-l font-bold mb-4">Stockfish Best Moves</h3> 
-              <p>Stockfish Move 0: {stockfishMove0.current["UCI"]}, CP: {stockfishMove0.current["CP"]}</p>
-              <p>Stockfish Move 1: {stockfishMove1.current["UCI"]}, CP: {stockfishMove1.current["CP"]}</p>
-              <p>Stockfish Move 2: {stockfishMove2.current["UCI"]}, CP: {stockfishMove2.current["CP"]}</p>
-              <h3 className="text-l font-bold mb-4">Popular Master Moves</h3> 
-              <p>Master Move 0: {masterMove0.current}</p>
-              <p>Master Move 1: {masterMove1.current}</p>
-              <p>Master Move 2: {masterMove2.current}</p>
-              <h3 className="text-l font-bold mb-4">Popular Moves over {minELO}</h3> 
-              <p>Move 0: {normieMove0.current}</p>
-              <p>Move 1: {normieMove1.current}</p>
-              <p>Move 2: {normieMove2.current}</p>
-            {!disableAnalysisBoardButton.current && <button onClick={() => openLichessAnalysisBoard(analysisBoardFEN.current)} 
-            className={`mt-4 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}>Go To Lichess Analysis Board</button>}
-          </div>
+      <div className="w-full md:w-1/3">
+        <div className="bg-cream-100 p-2 rounded">
+          <h2 className="text-xl font-bold mb-4">Move Analysis</h2> 
+            <h3 className="text-l font-bold mb-4">Your Move: {yourMove.current}</h3> 
+            {loadingAPIResponses && <div className="loader flex items-center">
+            <span className="pr-5 font-bold">Loading Best Moves</span>
+            <ClipLoader
+            color={"#00ff00"}
+            loading={loadingAPIResponses.current}
+            override={override}
+            size={20}
+            /></div>}
+            {loadingAPIResponses && <div className="pb-5">Feel Free to Play Your Move in the Meantime</div>}
+            <h3 className="text-l font-bold mb-4">Stockfish Best Moves</h3> 
+            <p>Stockfish Move 0: {stockfishMove0.current["UCI"]}, CP: {stockfishMove0.current["CP"]}</p>
+            <p>Stockfish Move 1: {stockfishMove1.current["UCI"]}, CP: {stockfishMove1.current["CP"]}</p>
+            <p>Stockfish Move 2: {stockfishMove2.current["UCI"]}, CP: {stockfishMove2.current["CP"]}</p>
+            <h3 className="text-l font-bold mb-4">Popular Master Moves</h3> 
+            <p>Master Move 0: {masterMove0.current}</p>
+            <p>Master Move 1: {masterMove1.current}</p>
+            <p>Master Move 2: {masterMove2.current}</p>
+            <h3 className="text-l font-bold mb-4">Popular Moves over {minELO}</h3> 
+            <p>Move 0: {normieMove0.current}</p>
+            <p>Move 1: {normieMove1.current}</p>
+            <p>Move 2: {normieMove2.current}</p>
+          {!disableAnalysisBoardButton.current && <button onClick={() => openLichessAnalysisBoard(analysisBoardFEN.current)} 
+          className={`mt-4 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}>Go To Lichess Analysis Board</button>}
         </div>
+      </div>
     </div>
   </div>
   )
